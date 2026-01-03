@@ -12,20 +12,22 @@ import SwiftUI
  Each card gets a random beautiful gradient background.
  */
 struct SwipeCardView: View {
-
-    /// Current drag offset
     @State private var offset: CGSize = .zero
-
-    /// Random gradient for this card (created once)
     private let gradient: LinearGradient
-
     let word: String
+    
+    // 1. Add a callback to notify the parent deck
+    var onSwipe: (Bool) -> Void // True for right, false for left
+    
+    // 2. Add a property to control the blur from the outside
+    var isBlurred: Bool = false
 
-    /// Swipe decision threshold
     private let swipeThreshold: CGFloat = 120
 
-    init(word: String) {
+    init(word: String, isBlurred: Bool = false, onSwipe: @escaping (Bool) -> Void) {
         self.word = word
+        self.isBlurred = isBlurred
+        self.onSwipe = onSwipe
         self.gradient = SwipeCardView.randomGradient()
     }
 
@@ -43,12 +45,17 @@ struct SwipeCardView: View {
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
                     .padding()
+                    // Apply blur ONLY to the content if specified
+                    .blur(radius: isBlurred ? 10 : 0)
             )
             .frame(width: 300, height: 420)
             .offset(offset)
             .rotationEffect(.degrees(Double(offset.width / 15)))
+            // Optional: Subtle scale effect for blurred cards
+            .scaleEffect(isBlurred ? 0.95 : 1.0)
             .gesture(
-                DragGesture()
+                // Disable drag if the card is blurred (background card)
+                isBlurred ? nil : DragGesture()
                     .onChanged { value in
                         offset = value.translation
                     }
@@ -57,11 +64,9 @@ struct SwipeCardView: View {
                     }
             )
             .animation(.spring(), value: offset)
+            .animation(.default, value: isBlurred)
     }
 
-    /**
-     Decides whether the card is liked, disliked, or snapped back.
-     */
     private func handleSwipe() {
         if offset.width > swipeThreshold {
             swipeRight()
@@ -74,50 +79,41 @@ struct SwipeCardView: View {
 
     private func swipeRight() {
         offset = CGSize(width: 1000, height: 0)
-        // TODO: notify parent (liked)
+        // Notify parent after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            onSwipe(true)
+        }
     }
 
     private func swipeLeft() {
         offset = CGSize(width: -1000, height: 0)
-        // TODO: notify parent (disliked)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            onSwipe(false)
+        }
     }
-
-    // MARK: - Gradient factory
-
-    /**
-     Generates a visually pleasing random gradient.
-     */
+    
+    // ... (Keep your randomGradient function here)
     private static func randomGradient() -> LinearGradient {
-        let palettes: [[Color]] = [
-            [.pink, .orange],
-            [.purple, .blue],
-            [.teal, .green],
-            [.indigo, .cyan],
-            [.red, .yellow],
-            [.mint, .blue],
-            [.purple, .pink]
-        ]
-
+        let palettes: [[Color]] = [[.pink, .orange], [.purple, .blue], [.teal, .green]]
         let colors = palettes.randomElement() ?? [.blue, .purple]
-
-        return LinearGradient(
-            colors: colors,
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        return LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 }
 
 
-#Preview {
-    SwipeCardView(word: "Kaiba")
+#Preview("Active Card") {
+    ZStack {
+        Color.black.ignoresSafeArea() // Background to show glass effect
+        SwipeCardView(word: "Kaiba", isBlurred: false) { isRightSwipe in
+            print("Swiped: \(isRightSwipe ? "Right" : "Left")")
+        }
+    }
 }
 
-#Preview {
-    SwipeCardView(word: "Kaiba")
-}
-
-#Preview {
-    SwipeCardView(word: "Kaiba")
+#Preview("Blurred Card") {
+    ZStack {
+        Color.black.ignoresSafeArea()
+        SwipeCardView(word: "Yugi", isBlurred: true) { _ in }
+    }
 }
 

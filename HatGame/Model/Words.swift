@@ -15,9 +15,6 @@ final class Words {
     @Published private(set) var currentRoundLeftWords = Set<String>()
     @Published private(set) var currentTurnSkippedWords = Set<String>()
     
-    
-
-    
     private let easyWords: Set<String> = [
         "спалня",
         "метро",
@@ -2075,11 +2072,15 @@ final class Words {
       "модернизация",
     ]
     
-    enum level {
-        case easy, medium, hard
+    enum Level: String, CaseIterable, Identifiable {
+        case easy = "Лесно"
+        case medium = "Средно"
+        case hard = "Трудно"
+
+        var id: String { rawValue }
     }
     
-    func selectWords(from wordsLevel: Words.level, count: Int) {
+    func selectWords(from wordsLevel: Words.Level, count: Int) {
         // Clear previous selection
         currentRoundSelectedWords.removeAll()
 
