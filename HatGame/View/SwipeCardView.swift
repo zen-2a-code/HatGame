@@ -48,7 +48,7 @@ struct SwipeCardView: View {
                     // Apply blur ONLY to the content if specified
                     .blur(radius: isBlurred ? 10 : 0)
             )
-            .frame(width: 300, height: 420)
+            .frame(width: 350, height: 500)
             .offset(offset)
             .rotationEffect(.degrees(Double(offset.width / 15)))
             // Optional: Subtle scale effect for blurred cards

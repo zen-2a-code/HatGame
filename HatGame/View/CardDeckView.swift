@@ -11,11 +11,8 @@ struct CardDeckView: View {
     @State private var words = ["Kaiba", "Yugi", "Joey", "Pegasus", "Bakura"]
 
     var body: some View {
+        
         ZStack {
-            // Background color to see the blur effect better
-            LinearGradient(colors: [.black.opacity(0.8), .black], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-
             ForEach(Array(words.enumerated()), id: \.element) { index, word in
                 // The card is the "top card" if its index is the last one in the array
                 let isTopCard = index == words.count - 1
@@ -35,6 +32,7 @@ struct CardDeckView: View {
             if words.isEmpty {
                 ContentUnavailableView("Няма повече карти", systemImage: "square.stack.3d.up.slash")
                     .foregroundStyle(.white)
+                    .border(.blue)
             }
         }
     }
@@ -49,5 +47,10 @@ struct CardDeckView: View {
 }
 
 #Preview {
-    CardDeckView()
+    ZStack {
+        // Background color to see the blur effect better
+        LinearGradient(colors: [.black.opacity(0.8), .black], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+        CardDeckView()
+    }
 }

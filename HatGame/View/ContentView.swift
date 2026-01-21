@@ -13,16 +13,14 @@ struct ContentView: View {
     @State private var wordsDifficultyLevel: Words.Level = .medium
     @State private var showTeamSelectionScreen: Bool = true
     @State private var game: Game?
+    @State var shouldStartTimer: Bool = true
     var body: some View {
         
         NavigationStack {
             VStack {
-                SwipeCardView(word: "Yugi", isBlurred: false) { _ in }
-                
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("Hello, world!")
+                TimerView(shouldStartTimer: $shouldStartTimer, onTimerFinished: {})
+                CardDeckView()
+    
             }
             .padding()
             .navigationDestination(isPresented: $showTeamSelectionScreen) {
@@ -30,13 +28,10 @@ struct ContentView: View {
         }
         
         }
-        .onChange(of: showTeamSelectionScreen) { _, isSetupScreenDisplayed in
-            
-        }
     }
     private func initGame() {
         let teams = (1...teamsCount).map { Team(name: "Отбор \($0)", score: 0) }
-        game = Game(teams: teams, currentTurnSkipCount: 0, leftTimePerTurn: 60, difficulty: wordsDifficultyLevel)
+        game = Game(allTeams: teams, currentTurnSkipCount: 0, leftTimePerTurn: 60, difficulty: wordsDifficultyLevel)
     }
 }
 

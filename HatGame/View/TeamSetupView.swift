@@ -40,15 +40,13 @@ struct TeamSetupView: View {
                     Text("Моля изберете брой отбори")
                         .font(.title2)
                         .foregroundStyle(.white)
+                    
+                    
+                    Stepper("Брой отбори: \(selectedCountOfTeams)", value: $selectedCountOfTeams, in: 2 ... 11, step: 1)
+                        .foregroundStyle(.white)
+                        .fontWeight(.semibold)
+                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
 
-                    Picker("Брой играчи", selection: $selectedCountOfTeams) {
-                        ForEach(2 ..< 11, id: \.self) { number in
-                            Text("\(number)").tag(number)
-                                .foregroundStyle(.white)
-                                .fontWeight(.semibold)
-                        }
-                    }
-                    .pickerStyle(.wheel)
                     Spacer()
                 }
             }
